@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHP3rd Database</title>
+    <style>
+        /* --- 1. THEME VARIABLES (ROOT) --- */
+        :root {
+            /* MHP3rd PALETTE */
+            --bg-color: #1a1b20;       /* Dark Indigo/Charcoal Background */
+            --panel-bg: #26272e;       /* Slightly lighter panel background */
+            --text-main: #e0e0e0;      /* Off-white text */
+            --text-dim: #a0a0a0;       /* Description text */
+            
+            /* The "Yukumo" Colors */
+            --yukumo-red: #d93d3d;     /* Bright Red (Active State) */
+            --yukumo-gold: #cfaa6e;    /* Muted Gold (Headers/Borders) */
+            --border-color: #4a4d55;   /* UI Borders */
+        }
+
+        /* --- 2. GENERAL RESET --- */
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(to bottom, #141417, #1a1b20); /* Subtle gradient */
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 60px;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- MAIN HERO SECTION --- */
+        .main-hero {
+            width: 95%;
+            max-width: 1024px;
+            margin: 40px auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        .hero-content {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .hero-content h2 {
+            color: var(--yukumo-gold);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--yukumo-red);
+            display: inline-block;
+        }
+
+        .hero-content p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .hero-content .label {
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 8px;
+            /* A placeholder image for the MHP3rd logo/cover */
+        }
+
+        /* Responsive layout for hero section */
+        @media (max-width: 768px) {
+            .main-hero {
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .hero-content {
+                padding-right: 0;
+                padding-top: 20px;
+            }
+            .hero-image img {
+                max-height: 250px;
+            }
+        }
+
+        /* --- ORIGINAL STYLES BELOW --- */
+        h1 { 
+            color: var(--yukumo-gold); 
+            margin-top: 30px; 
+            text-align: center; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--yukumo-red); /* Red underline line */
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* --- 3. HIDE RADIO INPUTS --- */
+        input[type="radio"] { display: none; }
+
+        /* --- 4. CAROUSEL WRAPPER --- */
+        .carousel-wrapper {
+            position: relative;
+            width: 95%;
+            max-width: 1024px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .carousel-container {
+            flex-grow: 1;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            gap: 0; /* Gap handled by padding */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+            
+            /* Add a background strip behind icons */
+            background: rgba(0,0,0,0.3); 
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .carousel-container::-webkit-scrollbar { display: none; }
+
+        /* Picture Buttons */
+        .pic-label {
+            display: block;
+            cursor: pointer;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            flex-shrink: 0;
+            padding: 8px;
+            box-sizing: border-box;
+            opacity: 0.7; /* Dim when inactive */
+            transition: all 0.3s;
+        }
+
+        .pic-label img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+            background: #000;
+        }
+
+        /* Responsive Widths */
+        .pic-label { flex: 0 0 33.333%; }
+        @media (min-width: 640px) { .pic-label { flex: 0 0 25%; } }
+        @media (min-width: 900px) { .pic-label { flex: 0 0 20%; } }
+        @media (min-width: 1024px) { .pic-label { flex: 0 0 16.666%; } }
+
+        /* ACTIVE STATE (The P3rd Red Glow) */
+        input:checked + .carousel-wrapper, /* Logic helper */
+        #mon1:checked ~ .carousel-wrapper label[for="mon1"],
+        #mon2:checked ~ .carousel-wrapper label[for="mon2"],
+        #mon3:checked ~ .carousel-wrapper label[for="mon3"],
+        #mon4:checked ~ .carousel-wrapper label[for="mon4"],
+        #mon5:checked ~ .carousel-wrapper label[for="mon5"],
+        #mon6:checked ~ .carousel-wrapper label[for="mon6"],
+        #mon7:checked ~ .carousel-wrapper label[for="mon7"],
+        #mon8:checked ~ .carousel-wrapper label[for="mon8"],
+        #mon9:checked ~ .carousel-wrapper label[for="mon9"],
+        #mon10:checked ~ .carousel-wrapper label[for="mon10"] {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        /* Target the IMG inside the checked label */
+        #mon1:checked ~ .carousel-wrapper label[for="mon1"] img,
+        #mon2:checked ~ .carousel-wrapper label[for="mon2"] img,
+        #mon3:checked ~ .carousel-wrapper label[for="mon3"] img,
+        #mon4:checked ~ .carousel-wrapper label[for="mon4"] img,
+        #mon5:checked ~ .carousel-wrapper label[for="mon5"] img,
+        #mon6:checked ~ .carousel-wrapper label[for="mon6"] img,
+        #mon7:checked ~ .carousel-wrapper label[for="mon7"] img,
+        #mon8:checked ~ .carousel-wrapper label[for="mon8"] img,
+        #mon9:checked ~ .carousel-wrapper label[for="mon9"] img,
+        #mon10:checked ~ .carousel-wrapper label[for="mon10"] img {
+            border-color: var(--yukumo-red);
+            box-shadow: 0 0 15px rgba(217, 61, 61, 0.4);
+        }
+
+        /* --- ARROWS --- */
+        .arrow {
+            background-color: var(--panel-bg);
+            color: var(--yukumo-gold);
+            border: 1px solid var(--yukumo-gold);
+            width: 40px;
+            height: 40px;
+            border-radius: 4px; /* Square with slight round, more rigid UI */
+            font-size: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.2s;
+        }
+        .arrow:hover { 
+            background-color: var(--yukumo-red); 
+            color: white;
+            border-color: var(--yukumo-red);
+        }
+
+        /* --- 5. CONTENT SECTIONS --- */
+        .content-wrapper {
+            width: 95%;
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        .monster-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Switch logic */
+        #mon1:checked ~ .content-wrapper #content-1 { display: block; }
+        #mon2:checked ~ .content-wrapper #content-2 { display: block; }
+        #mon3:checked ~ .content-wrapper #content-3 { display: block; }
+        #mon4:checked ~ .content-wrapper #content-4 { display: block; }
+        #mon5:checked ~ .content-wrapper #content-5 { display: block; }
+        #mon6:checked ~ .content-wrapper #content-6 { display: block; }
+        #mon7:checked ~ .content-wrapper #content-7 { display: block; }
+        #mon8:checked ~ .content-wrapper #content-8 { display: block; }
+        #mon9:checked ~ .content-wrapper #content-9 { display: block; }
+        #mon10:checked ~ .content-wrapper #content-10 { display: block; }
+
+        /* --- BOX STYLING --- */
+        .info-box, .gallery-box {
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 6px;
+            border-top: 3px solid var(--yukumo-gold); /* Top Accent Border */
+            border-bottom: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .info-box h2, .gallery-box h3 {
+            color: var(--yukumo-gold);
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .info-box p { 
+            color: var(--text-dim); 
+            line-height: 1.8; 
+            font-size: 1.1rem;
+        }
+
+        /* --- GALLERY GRID --- */
+        .gallery-grid {
+            display: grid;
+            gap: 15px;
+            width: 100%;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 640px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .gallery-item {
+            position: relative;
+            border: 2px solid var(--panel-bg);
+            transition: border 0.3s;
+        }
+        .gallery-item:hover {
+            border-color: var(--yukumo-red);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="main-hero">
+        <div class="hero-content">
+            <h2>Monster Hunter Portable 3rd</h2>
+            <p><span class="label">Released:</span> December 1, 2010</p>
+            <p><span class="label">Platform:</span> PlayStation Portable (PSP)</p>
+        </div>
+        <div class="hero-image">
+            <img src="https://picsum.photos/400/300?random=99" alt="MHP3rd Logo/Cover Art">
+        </div>
+    </section>
+
+    <h1>HUNTER'S NOTES</h1>
+
+    <input type="radio" name="monster" id="mon1" checked>
+    <input type="radio" name="monster" id="mon2">
+    <input type="radio" name="monster" id="mon3">
+    <input type="radio" name="monster" id="mon4">
+    <input type="radio" name="monster" id="mon5">
+    <input type="radio" name="monster" id="mon6">
+    <input type="radio" name="monster" id="mon7">
+    <input type="radio" name="monster" id="mon8">
+    <input type="radio" name="monster" id="mon9">
+    <input type="radio" name="monster" id="mon10">
+
+    <div class="carousel-wrapper">
+        <button class="arrow" onclick="scrollList(-1)">&#10094;</button>
+        
+        <div class="carousel-container" id="scrollContainer">
+            <label for="mon1" class="pic-label"><img src="https://picsum.photos/200/200?random=1" alt="Mon 1"></label>
+            <label for="mon2" class="pic-label"><img src="https://picsum.photos/200/200?random=2" alt="Mon 2"></label>
+            <label for="mon3" class="pic-label"><img src="https://picsum.photos/200/200?random=3" alt="Mon 3"></label>
+            <label for="mon4" class="pic-label"><img src="https://picsum.photos/200/200?random=4" alt="Mon 4"></label>
+            <label for="mon5" class="pic-label"><img src="https://picsum.photos/200/200?random=5" alt="Mon 5"></label>
+            <label for="mon6" class="pic-label"><img src="https://picsum.photos/200/200?random=6" alt="Mon 6"></label>
+            <label for="mon7" class="pic-label"><img src="https://picsum.photos/200/200?random=7" alt="Mon 7"></label>
+            <label for="mon8" class="pic-label"><img src="https://picsum.photos/200/200?random=8" alt="Mon 8"></label>
+            <label for="mon9" class="pic-label"><img src="https://picsum.photos/200/200?random=9" alt="Mon 9"></label>
+            <label for="mon10" class="pic-label"><img src="https://picsum.photos/200/200?random=10" alt="Mon 10"></label>
+        </div>
+
+        <button class="arrow" onclick="scrollList(1)">&#10095;</button>
+    </div>
+
+    <div class="content-wrapper">
+
+        <div class="monster-content" id="content-1">
+            <div class="info-box">
+                <h2>Gold Rathian</h2>
+                <p>A rare species of female flying wyvern covered in shining gold scales. Known as the Golden Moon.</p>
+            </div>
+            <div class="gallery-box">
+                <h3>Observation Log</h3>
+                <div class="gallery-grid">
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=101"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=102"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=103"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=104"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=105"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=106"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="monster-content" id="content-2">
+            <div class="info-box">
+                <h2>Silver Rathalos</h2>
+                <p>A rare species of male flying wyvern. Known as the Silver Sun.</p>
+            </div>
+            <div class="gallery-box">
+                <h3>Observation Log</h3>
+                <div class="gallery-grid">
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=201"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=202"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=203"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=204"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=205"></div>
+                    <div class="gallery-item"><img src="https://picsum.photos/600/400?random=206"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="monster-content" id="content-3">
+            <div class="info-box"><h2>Nargacuga</h2><p>Lives in dense forests and attacks from shadows.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=301"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=302"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=303"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=304"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=305"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=306"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-4">
+            <div class="info-box"><h2>Zinogre</h2><p>The Thunder Wolf Wyvern, flagship of Portable 3rd.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=401"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=402"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=403"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=404"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=405"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=406"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-5">
+            <div class="info-box"><h2>Tigrex</h2><p>Known for its ear-splitting roar.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=501"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=502"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=503"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=504"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=505"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=506"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-6">
+            <div class="info-box"><h2>Brachydios</h2><p>Crushing Wyvern with explosive slime.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=601"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=602"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=603"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=604"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=605"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=606"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-7">
+            <div class="info-box"><h2>Glavenus</h2><p>Cutting Wyvern with a sword tail.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=701"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=702"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=703"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=704"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=705"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=706"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-8">
+            <div class="info-box"><h2>Mizutsune</h2><p>Bubble Fox Leviathan.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=801"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=802"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=803"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=804"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=805"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=806"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-9">
+            <div class="info-box"><h2>Astalos</h2><p>Electric Wyvern.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=901"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=902"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=903"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=904"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=905"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=906"></div></div></div>
+        </div>
+
+        <div class="monster-content" id="content-10">
+            <div class="info-box"><h2>Gammoth</h2><p>The Winter Beast.</p></div>
+            <div class="gallery-box"><h3>Observation Log</h3><div class="gallery-grid"><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1001"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1002"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1003"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1004"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1005"></div><div class="gallery-item"><img src="https://picsum.photos/600/400?random=1006"></div></div></div>
+        </div>
+
+    </div>
+
+    <script>
+        function scrollList(direction) {
+            const container = document.getElementById('scrollContainer');
+            const item = container.querySelector('.pic-label');
+            const scrollAmount = item.offsetWidth; 
+            container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
